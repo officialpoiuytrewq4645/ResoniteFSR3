@@ -4,6 +4,7 @@ ResoniteFSR3 - optional vrperfkit add-on (VR performance)
 AI-GENERATED SOFTWARE: I made the patches to vrperfkit with an AI coding assistant (Claude).
 I directed it and tested it in-game. - poiuytrewq4645
 
+Source of this build: https://github.com/officialpoiuytrewq4645/VRPerfKit_RSF-ResoniteFSR3
 A patched build of VRPerfKit_RSF (https://github.com/RavenSystem/VRPerfKit_RSF), itself a fork of
 fholger's vrperfkit (https://github.com/fholger/vrperfkit). Stock vrperfkit/RSF does nothing in Resonite:
 it hooks the wrong OpenVR compositor interface (Resonite's Unity 2019 renderer submits through

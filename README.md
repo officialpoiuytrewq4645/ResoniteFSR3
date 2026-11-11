@@ -36,19 +36,18 @@ stable image.
 > ## 🧪 Alpha
 >
 > It works and I use it every day, but expect rough edges (see **Known issues**). Settings and behaviour may change
-> between versions. If something breaks, please open an issue and include your `Renderer\BepInEx\LogOutput.log`.
+> between versions. If something breaks, please [open an issue](https://github.com/officialpoiuytrewq4645/ResoniteFSR3/issues) and include your
+> `Renderer\BepInEx\LogOutput.log`.
 >
 > **What I've tested:** desktop, and VR on a Bigscreen Beyond 2e (RX 7900 XTX) **with the vrperfkit add-on's `dxgi.dll`
 > installed**: native AA, FSR 3.1 upscaling, native AA + FSR 1, and the experimental eye-tracked foveated rendering.
 > I haven't tested VR without the add-on installed, so if you try that, I'd like to hear how it goes.
 
-<!-- TODO: replace "open an issue" above with the repository's issues link, e.g. https://github.com/poiuytrewq4645/ResoniteFSR3/issues -->
-
 ## Download
 
 - **Mod manager (recommended):** search for *ResoniteFSR3* in Gale / r2modman (Thunderstore).
   <!-- TODO: add the Thunderstore page link after uploading -->
-- **Manual / vrperfkit add-on:** see the GitHub **Releases** page.
+- **Manual / vrperfkit add-on:** see the [Releases page](https://github.com/officialpoiuytrewq4645/ResoniteFSR3/releases).
 
 ## How to use
 
@@ -165,9 +164,8 @@ dependencies above (the projects reference Resonite's own assemblies).
 4. `dotnet build -c Release` in `Plugin/` (renderer plugin) and in `SettingsPlugin/` (dashboard settings plugin).
    Set `ResoniteDirectory` if Resonite isn't in the default Steam location.
 
-The vrperfkit add-on is built from a separate fork of VRPerfKit_RSF (CMake + Visual Studio 2022).
-
-<!-- TODO: link the vrperfkit fork once it is published -->
+The vrperfkit add-on is built from [a patched fork of VRPerfKit_RSF](https://github.com/officialpoiuytrewq4645/VRPerfKit_RSF-ResoniteFSR3) (CMake + Visual Studio 2022); its
+README lists the changes and the build command.
 
 ## Uninstall
 

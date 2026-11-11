@@ -1,7 +1,7 @@
 {
     "name":  "ResoniteFSR3",
     "version_number":  "0.1.0",
-    "website_url":  "",
+    "website_url":  "https://github.com/officialpoiuytrewq4645/ResoniteFSR3",
     "description":  "ALPHA, AI-generated code. FSR 3.1 anti-aliasing for Resonite, desktop and VR (select TAA). Native AA costs GPU time; experimental VR FSR 3.1 upscaling (needs the vrperfkit add-on) improves performance.",
     "dependencies":  [
                          "ResoniteModding-BepisLoader-1.7.0",
