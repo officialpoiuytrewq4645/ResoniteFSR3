@@ -94,7 +94,9 @@ If your headset has eye tracking, **Foveated Rendering → Mode = QuadViews** re
 resolution (`QuadViewOuterScale`) and adds a small full-resolution inset per eye that follows your gaze, with FSR 3.1
 anti-aliasing inside it.
 
-<!-- TODO: add docs/foveation-example.png (SteamVR VR View capture; normal SteamVR screenshots don't show the inset) -->
+![Foveated rendering: the circled area follows the gaze at full resolution, the rest is rendered at a lower resolution](docs/foveation-example.webp)
+
+*SteamVR VR View capture with eye tracking: inside the red circle is the full-resolution inset, outside it the lower-resolution periphery.*
 
 - **Gaze source:** `SteamVR` (default) reads gaze straight from SteamVR, which works with any eye tracker that has a
   SteamVR driver (I use Bigscreen's own eye tracking on the Beyond 2e). Until SteamVR reports gaze, it falls back to
