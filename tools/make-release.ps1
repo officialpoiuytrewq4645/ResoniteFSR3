@@ -1,5 +1,5 @@
 # Builds the release packages from the current build outputs.
-#   Release\ResoniteFSR3-<version>-thunderstore.zip   (mod manager package)
+#   Release\ResoniteFSR3-<version>.zip                (mod package, Thunderstore layout: mod managers can import it)
 #   Release\ResoniteFSR3-vrperfkit-addon-<version>.zip (manual dxgi.dll add-on)
 # Zips are written with .NET ZipFile and forward-slash entry names (Compress-Archive uses backslashes, which
 # Thunderstore / mod managers don't accept).
@@ -53,7 +53,7 @@ function New-ForwardSlashZip([string]$SourceDirectory, [string]$ZipPath) {
     }
 }
 
-$packageZip = Join-Path $releaseDirectory "ResoniteFSR3-$Version-thunderstore.zip"
+$packageZip = Join-Path $releaseDirectory "ResoniteFSR3-$Version.zip"
 $addonZip = Join-Path $releaseDirectory "ResoniteFSR3-vrperfkit-addon-$Version.zip"
 New-ForwardSlashZip $packageDirectory $packageZip
 New-ForwardSlashZip $addonDirectory $addonZip

@@ -12,12 +12,12 @@ anti-aliasing, on desktop **and in VR**. Resonite normally turns TAA off in VR, 
 gives you proper temporal anti-aliasing instead: much cleaner edges, far less shimmer on thin details, and a more
 stable image.
 
-| Before | After (FSR 3.1) |
+| Before (Resonite's SMAA) | After (FSR 3.1) |
 |---|---|
 | ![Before](docs/comparison-before.webp) | ![After](docs/comparison-after.webp) |
 
-*Captured in VR. Look at the guitar strings, the window blinds and the edges of the plant leaves.*
-<!-- TODO: note which anti-aliasing / settings the "Before" image used -->
+*Captured in VR: Resonite's SMAA on the left, FSR 3.1 native anti-aliasing on the right. Look at the guitar strings,
+the window blinds and the edges of the plant leaves.*
 
 > ## ⚠️ By default this makes the game look better, not run faster
 >
@@ -43,17 +43,25 @@ stable image.
 > installed**: native AA, FSR 3.1 upscaling, native AA + FSR 1, and the experimental eye-tracked foveated rendering.
 > I haven't tested VR without the add-on installed, so if you try that, I'd like to hear how it goes.
 
-## Download
+## Download and install
 
-- **Mod manager (recommended):** search for *ResoniteFSR3* in Gale / r2modman (Thunderstore).
-  <!-- TODO: add the Thunderstore page link after uploading -->
-- **Manual / vrperfkit add-on:** see the [Releases page](https://github.com/officialpoiuytrewq4645/ResoniteFSR3/releases).
+Everything is on the [Releases page](https://github.com/officialpoiuytrewq4645/ResoniteFSR3/releases). It isn't on Thunderstore yet.
+
+1. **Dependencies.** Install these four mods by ResoniteModding with a mod manager (Gale or r2modman, Resonite
+   community): [BepisLoader](https://thunderstore.io/c/resonite/p/ResoniteModding/BepisLoader/), [BepInExRenderer](https://thunderstore.io/c/resonite/p/ResoniteModding/BepInExRenderer/),
+   [RenderiteHook](https://thunderstore.io/c/resonite/p/ResoniteModding/RenderiteHook/) and [BepisModSettings](https://thunderstore.io/c/resonite/p/ResoniteModding/BepisModSettings/).
+2. **The mod.** Download `ResoniteFSR3-0.1.0.zip` and either:
+   - import it into your mod manager as a local mod (Gale: *Import → Import local mod*; r2modman: *Settings → Import
+     local mod*), or
+   - install it by hand: copy `plugins\ResoniteFSR3.Settings\` into `Resonite\BepInEx\plugins\`, and
+     `Renderer\BepInEx\plugins\ResoniteFSR3\` into `Resonite\Renderer\BepInEx\plugins\`.
+3. **Optional, VR upscaling:** download `ResoniteFSR3-vrperfkit-addon-0.1.0.zip` and copy `dxgi.dll` and
+   `vrperfkit_RSF.yml` into `Resonite\Renderer\` (see below).
 
 ## How to use
 
-1. Install with a Thunderstore mod manager (Gale / r2modman). Dependencies install automatically.
-2. Launch Resonite.
-3. **Settings → Graphics → Anti-aliasing → TAA.** That's it: TAA is now FSR 3.1.
+1. Launch Resonite.
+2. **Settings → Graphics → Anti-aliasing → TAA.** That's it: TAA is now FSR 3.1.
 
 Every option is in **Settings → Mods → Resonite FSR 3.1** in the dashboard and applies **live**, without restarting.
 
@@ -85,6 +93,8 @@ full-resolution output to SteamVR. Keep the add-on's own FSR 1 upscaling **off**
 If your headset has eye tracking, **Foveated Rendering → Mode = QuadViews** renders the whole view at a low
 resolution (`QuadViewOuterScale`) and adds a small full-resolution inset per eye that follows your gaze, with FSR 3.1
 anti-aliasing inside it.
+
+<!-- TODO: add docs/foveation-example.png (SteamVR VR View capture; normal SteamVR screenshots don't show the inset) -->
 
 - **Gaze source:** `SteamVR` (default) reads gaze straight from SteamVR, which works with any eye tracker that has a
   SteamVR driver (I use Bigscreen's own eye tracking on the Beyond 2e). Until SteamVR reports gaze, it falls back to
