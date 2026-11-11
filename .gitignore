@@ -1,0 +1,20 @@
+upstream-FSR3Unity/
+ShaderProject/Library/
+ShaderProject/Temp/
+ShaderProject/Logs/
+ShaderProject/obj/
+ShaderProject/UserSettings/
+ShaderProject/*.csproj
+ShaderProject/*.sln
+Build/
+Plugin/bin/
+Plugin/obj/
+*.log
+.dotnet/
+SettingsPlugin/bin/
+SettingsPlugin/obj/
+# Release packages are built by tools/make-release.ps1 and attached to GitHub releases
+Release/*.zip
+Release/ResoniteFSR3/*
+!Release/ResoniteFSR3/manifest.json
+Release/ResoniteFSR3-vrperfkit-addon/dxgi.dll

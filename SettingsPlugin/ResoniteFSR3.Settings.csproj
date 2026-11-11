@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Engine-side (FrooxEngine, .NET 10, BepisLoader) companion plugin: exposes the renderer plugin's settings in
+       Resonite's dashboard via BepisModSettings and mirrors them into the renderer's config file.
+       Build with the project-local SDK: ..\.dotnet\dotnet.exe build -c Release -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>ResoniteFSR3.Settings</AssemblyName>
+    <RootNamespace>ResoniteFSR3</RootNamespace>
+    <Version>0.1.0</Version>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <ResoniteDirectory Condition="'$(ResoniteDirectory)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Resonite</ResoniteDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Shared with the renderer plugin so both sides define identical settings -->
+    <Compile Include="..\Plugin\src\FsrSettings.cs" Link="FsrSettings.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx.Core"><HintPath>$(ResoniteDirectory)\BepInEx\core\BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="FrooxEngine"><HintPath>$(ResoniteDirectory)\FrooxEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Elements.Core"><HintPath>$(ResoniteDirectory)\Elements.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx.NET.Common"><HintPath>$(ResoniteDirectory)\BepInEx\core\BepInEx.NET.Common.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+
+</Project>

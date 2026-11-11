@@ -1,0 +1,156 @@
+// ResoniteFSR3: copies one eye's region of the (possibly double-wide single-pass stereo) camera color, depth and
+// motion vectors into standalone per-eye textures, so each eye gets its own FSR 3.1 context and history.
+// For mono (desktop) rendering the rect simply covers the whole frame.
+// SplitEyeWithOpaque additionally splits the opaque-only color (captured before transparents) for reactive mask generation.
+#pragma kernel SplitEye
+#pragma kernel SplitEyeWithOpaque
+#pragma kernel SplitColorOnly
+#pragma kernel MarkFoveaReactive
+
+Texture2D<float4> SourceColor;
+Texture2D<float> SourceDepth;
+Texture2D<float4> SourceMotion;
+Texture2D<float4> SourceOpaque;
+
+RWTexture2D<float4> EyeColor;
+RWTexture2D<float> EyeDepth;
+RWTexture2D<float2> EyeMotion;
+RWTexture2D<float4> EyeOpaque;
+
+// x, y = top-left offset of the eye inside the source textures; z, w = eye width, height
+int4 EyeRect;
+
+// ---- Foveation (experimental) ----------------------------------------------------------------------------------
+#include "resonitefsr3_foveation.hlsl"
+int FoveaEnabled;       // non-zero: the scene was rendered with the foveation depth mask
+int FoveaFillMode;      // 0 = none, 1 = spatial (copy from the kept quad in the same 4x4 block)
+int FoveaCount;         // non-zero: count masked pixels / masked pixels that kept the mask depth (reliability check)
+int FoveaEyeIndex;
+float FoveaMaskDepth;
+RWStructuredBuffer<uint> FoveaCounters; // [0] masked pixels, [1] masked pixels whose depth still equals the mask depth
+
+bool IsMaskedEyePixel(int2 eyePixel)
+{
+    return FoveaIsMasked(eyePixel, float2(EyeRect.zw), FoveaEyeIndex);
+}
+
+// In each 2x2 block of quads, the quad whose rotated index is 0 is never masked (in every ring), so a masked pixel can
+// take its fill data from the matching pixel of that quad directly instead of searching its neighbourhood.
+int2 KeptPixelOfQuad(int2 eyePixel)
+{
+    int keptQuadIndex = (4 - (FoveaFrame & 3)) & 3;
+    int2 keptPixel = (eyePixel & ~3) + 2 * int2(keptQuadIndex & 1, keptQuadIndex >> 1) + (eyePixel & 1);
+    return min(keptPixel, EyeRect.zw - 1);
+}
+
+void FillMaskedPixel(int2 eyePixel)
+{
+    int2 keptSourcePixel = KeptPixelOfQuad(eyePixel) + EyeRect.xy;
+    EyeColor[eyePixel] = SourceColor[keptSourcePixel];
+    EyeDepth[eyePixel] = SourceDepth[keptSourcePixel];
+    EyeMotion[eyePixel] = SourceMotion[keptSourcePixel].xy;
+}
+
+// Survival counting: reduce per thread group first, then one atomic per group (per-pixel atomics on one address are slow)
+groupshared uint GroupMaskedCount;
+groupshared uint GroupSurvivedCount;
+// -----------------------------------------------------------------------------------------------------------------
+
+bool SplitCommon(uint3 dispatchThreadId, uint groupIndex, out int2 eyePixel, out int2 sourcePixel)
+{
+    eyePixel = int2(dispatchThreadId.xy);
+    sourcePixel = eyePixel + EyeRect.xy;
+
+    if (FoveaCount != 0)
+    {
+        if (groupIndex == 0)
+        {
+            GroupMaskedCount = 0;
+            GroupSurvivedCount = 0;
+        }
+        GroupMemoryBarrierWithGroupSync();
+    }
+
+    bool insideEye = eyePixel.x < EyeRect.z && eyePixel.y < EyeRect.w;
+    bool masked = insideEye && FoveaEnabled != 0 && IsMaskedEyePixel(eyePixel);
+
+    if (FoveaCount != 0)
+    {
+        if (masked)
+        {
+            InterlockedAdd(GroupMaskedCount, 1);
+            if (abs(SourceDepth[sourcePixel] - FoveaMaskDepth) < 1e-6)
+                InterlockedAdd(GroupSurvivedCount, 1);
+        }
+        GroupMemoryBarrierWithGroupSync();
+        if (groupIndex == 0 && GroupMaskedCount != 0)
+        {
+            InterlockedAdd(FoveaCounters[0], GroupMaskedCount);
+            InterlockedAdd(FoveaCounters[1], GroupSurvivedCount);
+        }
+    }
+
+    if (!insideEye)
+        return false;
+
+    if (masked && FoveaFillMode != 0)
+    {
+        FillMaskedPixel(eyePixel);
+        return true;
+    }
+
+    EyeColor[eyePixel] = SourceColor[sourcePixel];
+    EyeDepth[eyePixel] = SourceDepth[sourcePixel];
+    EyeMotion[eyePixel] = SourceMotion[sourcePixel].xy;
+    return true;
+}
+
+[numthreads(8, 8, 1)]
+void SplitEye(uint3 dispatchThreadId : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex)
+{
+    int2 eyePixel;
+    int2 sourcePixel;
+    SplitCommon(dispatchThreadId, groupIndex, eyePixel, sourcePixel);
+}
+
+// Non-zero: flip vertically while copying. The final eye texture is stored top-down (D3D convention) while Unity's
+// intermediate render textures (where depth and motion vectors come from) are stored bottom-up.
+int FlipY;
+
+// Used for end-of-frame upscaling: splits only the final (post-processed) color of one eye
+[numthreads(8, 8, 1)]
+void SplitColorOnly(uint3 dispatchThreadId : SV_DispatchThreadID)
+{
+    int2 eyePixel = int2(dispatchThreadId.xy);
+    if (eyePixel.x >= EyeRect.z || eyePixel.y >= EyeRect.w)
+        return;
+    int sourceY = FlipY != 0 ? (EyeRect.w - 1 - eyePixel.y) : eyePixel.y;
+    EyeColor[eyePixel] = SourceColor[int2(eyePixel.x, sourceY) + EyeRect.xy];
+}
+
+[numthreads(8, 8, 1)]
+void SplitEyeWithOpaque(uint3 dispatchThreadId : SV_DispatchThreadID, uint groupIndex : SV_GroupIndex)
+{
+    int2 eyePixel;
+    int2 sourcePixel;
+    if (SplitCommon(dispatchThreadId, groupIndex, eyePixel, sourcePixel))
+        EyeOpaque[eyePixel] = SourceOpaque[sourcePixel];
+}
+
+// Foveation: raise FSR's reactive value on masked (filled) pixels so FSR leans on the current frame there instead of
+// accumulating the approximate fill into its history. Combines with the transparency reactive mask when present.
+RWTexture2D<float> EyeReactive;
+int ReactiveHasBase;        // non-zero: EyeReactive already holds this frame's transparency reactive mask
+float FoveaReactiveValue;
+
+[numthreads(8, 8, 1)]
+void MarkFoveaReactive(uint3 dispatchThreadId : SV_DispatchThreadID)
+{
+    int2 eyePixel = int2(dispatchThreadId.xy);
+    if (eyePixel.x >= EyeRect.z || eyePixel.y >= EyeRect.w)
+        return;
+    float reactive = ReactiveHasBase != 0 ? EyeReactive[eyePixel] : 0;
+    if (IsMaskedEyePixel(eyePixel))
+        reactive = max(reactive, FoveaReactiveValue);
+    EyeReactive[eyePixel] = reactive;
+}

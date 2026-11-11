@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>ResoniteFSR3</AssemblyName>
+    <RootNamespace>ResoniteFSR3</RootNamespace>
+    <Version>0.1.0</Version>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS0618</NoWarn>
+    <!-- DEVELOPMENT_BUILD keeps FSR's debug view pass and input validation available for calibration -->
+    <DefineConstants>$(DefineConstants);DEVELOPMENT_BUILD;UNITY_2019_4_OR_NEWER</DefineConstants>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <ResoniteDirectory Condition="'$(ResoniteDirectory)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Resonite</ResoniteDirectory>
+    <RendererManagedDirectory>$(ResoniteDirectory)\Renderer\Renderite.Renderer_Data\Managed</RendererManagedDirectory>
+    <RendererBepInExCoreDirectory>$(ResoniteDirectory)\Renderer\BepInEx\core</RendererBepInExCoreDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx"><HintPath>$(RendererBepInExCoreDirectory)\BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(RendererBepInExCoreDirectory)\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(RendererManagedDirectory)\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(RendererManagedDirectory)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(RendererManagedDirectory)\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AssetBundleModule"><HintPath>$(RendererManagedDirectory)\UnityEngine.AssetBundleModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.VRModule"><HintPath>$(RendererManagedDirectory)\UnityEngine.VRModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.IMGUIModule"><HintPath>$(RendererManagedDirectory)\UnityEngine.IMGUIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(RendererManagedDirectory)\UnityEngine.InputLegacyModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Postprocessing.Runtime"><HintPath>$(RendererManagedDirectory)\Unity.Postprocessing.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(RendererManagedDirectory)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Renderite.Shared"><HintPath>$(RendererManagedDirectory)\Renderite.Shared.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Renderite.Unity"><HintPath>$(RendererManagedDirectory)\Renderite.Unity.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SteamVR"><HintPath>$(RendererManagedDirectory)\SteamVR.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+
+</Project>
